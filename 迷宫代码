@@ -1,0 +1,1005 @@
+#include<stdio.h>
+#include<string.h>
+#include<windows.h>
+#include<stdlib.h>
+#include <time.h>
+#include <conio.h>
+#include<string.h>
+
+#define Hight 15//迷宫的高
+#define Wight 15//迷宫的宽
+#define H 3//关卡数
+#define M H*50//地图大小
+
+void find1();//生成答案迷宫的时候，找到玩家所在的坐标a,b，并将玩家所在的地方变为可视化的字符
+void Initialize(int num);//构造随机迷宫
+void Creat_01(int x_index,int Y_index);//将迷宫打通最终生成随机迷宫
+int IsHaveNeighbox(int X_index,int Y_index,int v);//生成随机迷宫的时候，查看是否有路可走
+void change();//将遍历的迷宫改为可视化
+int IsHaveNeighbox1(int X_index,int Y_index);//查看四周是否有路可走
+void print2();//打印答案迷宫
+void print();//打印普通迷宫声明
+void print1();//打印随机迷宫声明
+int up(int a);//方向的函数声明
+int dowm(int a);
+int turn(int a);
+int left(int a);
+
+void anser(int X_index, int Y_indexnt);//构造答案迷宫
+
+int game_time = 120;//限时 
+int begin_time;	//开始时间	
+int cur_time;   //当前时间 
+int count;//地图大小
+int level=0;//游戏等级
+int x,y,a,b,n;//定义需要用到的变量
+
+int map1[M][M];//生成随机迷宫
+int map1_answer[M][M];//生成答案迷宫
+
+
+
+
+int map[H][Hight][Wight]={
+{
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,3,1,0,1,1,1,0,0,0,1,1,1,0,0},
+	{0,0,1,0,1,0,1,1,1,1,0,0,1,0,0},
+	{0,0,1,1,1,0,1,0,0,1,0,0,1,0,0},
+	{0,0,1,0,0,0,1,1,1,1,1,1,1,0,0},
+	{0,0,1,0,1,0,1,0,0,1,0,1,0,1,0},
+	{0,0,1,0,1,1,1,0,0,1,0,0,1,1,0},
+	{0,0,1,0,1,0,1,1,0,1,1,1,1,0,0},
+	{0,0,1,0,1,0,0,0,0,1,0,0,1,0,0},
+	{0,0,1,1,1,1,1,1,1,1,1,0,1,0,0},
+	{0,0,1,0,1,0,0,0,0,0,0,0,1,0,0},
+	{0,0,1,0,1,1,0,0,1,1,1,1,1,0,0},
+	{0,0,1,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,1,1,1,1,1,1,1,1,1,1,1,1,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,4,0},
+},
+{
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,3,1,0,1,0,0,0,0,0,0,0,0,0,0},
+	{0,0,1,0,1,1,1,1,1,1,1,0,0,0,0},
+	{0,0,1,0,1,0,0,0,0,0,1,0,0,0,0},
+	{0,0,1,0,1,0,0,1,1,1,1,0,0,0,0},
+	{0,0,1,0,0,0,0,0,0,0,1,1,1,0,0},
+	{0,0,1,1,1,1,1,0,0,0,1,0,0,0,0},
+	{0,0,1,0,0,0,1,0,0,0,1,1,1,1,0},
+	{0,0,1,0,0,0,1,0,0,0,1,0,0,0,0},
+	{0,0,1,0,0,0,1,1,1,1,1,0,1,0,0},
+	{0,0,1,0,0,0,0,1,0,0,0,0,1,0,0},
+	{0,0,1,0,0,0,1,1,1,1,1,1,1,0,0},
+	{0,0,1,0,0,0,1,0,0,0,0,0,0,0,0},
+	{0,0,1,1,1,1,1,1,1,1,1,1,1,1,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,4,0},
+},
+	{
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,3,1,0,0,0,1,0,0,1,0,0,1,0,0},
+	{0,0,1,0,0,0,1,0,0,1,0,0,1,0,0},
+	{0,0,1,0,0,0,1,0,0,1,0,0,1,0,0},
+	{0,0,1,1,1,1,1,1,1,1,1,1,1,1,0},
+	{0,0,1,0,0,0,1,0,0,0,0,0,1,0,0},
+	{0,0,1,1,1,1,1,0,0,0,0,0,1,0,0},
+	{0,0,1,0,0,0,0,0,0,0,0,0,1,0,0},
+	{0,0,1,1,1,1,0,0,0,0,0,0,1,0,0},
+	{0,0,1,0,0,0,0,0,0,0,0,0,1,0,0},
+	{0,0,1,0,0,1,0,0,0,0,0,0,1,0,0},
+	{0,0,1,1,1,1,0,0,0,0,0,0,1,0,0},
+	{0,0,1,0,1,0,0,0,0,0,0,0,1,0,0},
+	{0,0,1,1,1,1,1,1,1,1,0,0,1,1,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,4,0},
+},
+};
+int menu()//初始化菜单
+{ scaa:
+    int  difficulty;
+	int x=1;int y=1;
+	char select[10];//生成一个数组用来储存输入的选项 
+ printf("******分别用wsad控制人物移动，按0退出游戏********\n");
+	 printf("*************************************************\n");
+	 printf("*************************************************\n");	 
+     printf("*************************************************\n");
+	
+	printf("**************请选择游戏关卡游戏(1,2,3)***********\n");
+	printf("**************随机生成地图请输入4*****************\n");
+	printf("**************闯关请输入5*************************\n");
+	
+
+	while(1)
+	{
+	scanf_s("%d",&select);//将选项储存在数组里
+	getchar();
+	if(strlen(select)>1) //防止出现不是理想的输入，多个字符
+	{
+	printf("错误输入，请重新输入\n");
+	}
+	else
+	{
+		if(select[0]==1)
+			{level=0;
+		     break;}
+		else if(select[0]==2)
+			{level=1;
+		      break;}
+		 else if(select[0]==3)
+			{level=2;
+		     break;}
+		 else if(select[0]==5)
+			 {level=0;
+		 system("cls");
+		 
+		
+	
+		     break;}
+
+		else if(select[0]==4)
+		{
+		  
+		 while(1)
+		 { returnss1:
+		 system("cls");	 
+		 printf("输入0退出游戏，输入1则返回上一步\n");
+		 printf("请输入地图大小：\n");
+			 scanf_s("%d",&count);
+			 getchar();
+		  if(count==1)
+		 {
+			 system("cls");
+		 goto scaa;
+		 }
+		  else if(count==0)
+			  exit(0);
+		  else if(count<5)
+			  {printf("输入错误，无法创建大小小于5的随机迷宫\n");
+		  Sleep(1500);}
+		  else
+			  break;
+		 }
+
+		 printf("请输入时间限制(秒)\n");
+		 scanf_s("%d",&game_time);
+		 getchar();
+		  if(game_time==1)
+		 goto returnss1;//返回上一级
+		 else if(game_time==0)
+			  exit(0);
+	
+		 Initialize(count);//构造随机迷宫
+		 break;
+		 }
+
+		else if(select[0]==0)
+			{exit(0);
+		     }
+		else
+			printf("输入错误请重新输入\n");
+	}
+	}
+	
+	int v=select[0];
+	system("cls");
+	if(v==1||v==2||v==3||v==5)//可以设置难度
+	{
+
+		 while(1){
+		 printf("简单，输入1  时间限制120秒  \n");
+		 printf("普通，输入2  时间限制60秒  \n");
+		 printf("困难，输入3  时间限制45秒  \n");
+		 printf("请选择难度，输入0返回主菜单\n");
+		 
+		 scanf_s("%d",&difficulty);
+		 getchar();
+		 switch(difficulty)
+		 {
+		 case 1:
+			 {
+			 game_time=120;
+			 break;
+			 }
+
+		case 2:
+			 {
+			 game_time=60;
+			 break;
+			 }
+
+
+		case 3:
+			 {
+			 game_time=45;
+			 break;
+			 }
+		case 0:
+			{
+				system("cls");
+			 goto scaa;
+			 break;
+			}
+		default :
+				break;
+
+		 }
+		 if(difficulty==1||difficulty==2||difficulty==3)
+			 break;
+		 else
+			 { 
+			 printf("输入错误请重新输入\n");
+		 Sleep(1800);
+		 system("cls");}
+
+		 
+		 }
+		  system("cls");
+	printf("\n");
+	printf("\n");
+	printf("\n");
+	printf("\n");
+	printf("\n");
+	printf("\n");
+	printf("                                                           ************************************************************************************\n");
+	printf("                                                           ***************************************第%d关****************************************\n",level+1);
+	printf("                                                           ************************************************************************************\n");
+	Sleep(1700);
+	}
+	begin_time = clock();
+	return v;
+}
+
+void print()//普通打印迷宫
+{
+	cur_time = clock(); //获取当前时间 
+	int t = (cur_time - begin_time) / 1000 ; //已用时间,单位是毫秒，所以需要除以1000 
+	printf("剩余时间：%2d", game_time - t);
+
+    printf("输入0返回主菜单\n");
+for(int i=0;i<Hight;i++)
+{
+	for(int k=0;k<Wight;k++)
+	{
+		if(map[level][i][k]==0)
+	        printf("■");//当数组为0的时候是墙
+		else if(map[level][i][k]==1)
+			printf("  ");//当数组为1的时候是路
+		else if(map[level][i][k]==3)
+			printf("○");//当数组为3的时候是玩家
+		else if(map[level][i][k]==4)
+			printf("★");//当数组为4的时候是终点
+	}
+	putchar('\n');
+
+}
+}
+
+void print1()//打印随机迷宫
+{
+	cur_time = clock(); //获取当前时间 
+	int t = (cur_time - begin_time) / 1000 ; //已用时间,单位是毫秒，所以需要除以1000 
+	printf("剩余时间：%2d\n", game_time - t);
+   printf("按q查看出路，按0返回主菜单\n");
+for(int i=0;i<count;i++)
+  {
+	for(int k=0;k<count;k++)
+	{
+		if(map1[i][k]==0)
+	        printf("■");//当数组为0的时候是墙
+		else if(map1[i][k]==1)
+			printf("  ");//当数组为1的时候是路
+		else if(map1[i][k]==3)
+			printf("○");//当数组为3的时候是玩家
+		else if(map1[i][k]==4)
+			printf("★");//当数组为4的时候是终点
+		else if(map1[i][k]==5)
+			printf("◇");//当数组为5的时候是路径
+		
+	  }
+	putchar('\n');
+
+    }
+
+}
+
+void print2()//打印答案迷宫
+ {
+	
+	
+	 printf("******************\n");
+	 printf("***出去的路径为***\n");
+	 printf("******************\n");
+  for(int i=0;i<count;i++)
+  {
+	for(int k=0;k<count;k++)
+	{
+		if(map1[i][k]==0)
+	        printf("■");//当数组为0的时候是墙
+		else if(map1[i][k]==1)
+			printf("  ");//当数组为1的时候是路
+		else if(map1[i][k]==3)
+			printf("○");//当数组为3的时候是玩家
+		else if(map1[i][k]==4)
+			printf("★");//当数组为4的时候是终点
+		else if(map1[i][k]==5)
+			printf("◇");//当数组为5的时候是路径
+		else if(map1[i][k]==6)//当数组为6的时候是答案的路径
+			printf("●");
+	  }
+	putchar('\n');
+
+    }
+
+ 
+ }
+
+
+void find1()//生成答案迷宫的时候，找到玩家所在的坐标a,b，并将玩家所在的地方变为可视化的字符
+{ 
+	
+	for(int i=0;i<count;i++)
+{
+	for(int k=0;k<count;k++)
+	{
+		
+		 if(map1[i][k]==3)
+		 {
+		 a=i;
+		 b=k;
+		 break;
+		 }
+		
+	}
+	
+}
+	map1[a][b] = 3;//将玩家所在的地方变为可视化的字符
+}
+
+void find(int v)//找到玩家所在的坐标，赋值给x，y
+{ 
+	if(v==4)//当选择随机迷宫的时候
+	{
+	for(int i=0;i<count;i++)
+{
+	for(int k=0;k<count;k++)
+	{
+		
+		 if(map1[i][k]==3)
+		 {
+		 x=i;
+		 y=k;
+		 break;
+		 }
+		
+	}
+	
+}
+	}
+	else//当选择普通迷宫的时候
+	{
+	for(int i=0;i<Hight;i++)
+{
+	for(int k=0;k<Wight;k++)
+	{
+		
+		 if(map[level][i][k]==3)
+		 {
+		 x=i;
+		 y=k;
+		 break;
+		 }
+		
+	}
+	
+}
+}
+}
+
+int move(int v)//玩家进行移动
+{
+	for(int i=0;i<3;i++)
+	{
+	for(int j=0;j<Hight;j++)
+	{
+	for(int r=0;r<Wight;r++)
+	{
+	if(map[i][j][r]==3)
+		map[i][j][r]=1;
+	     
+	}
+	}
+		map[i][1][1]=3;//每次结束游戏将游戏初始化
+	
+	}
+	
+	
+	int g=0;//设置一个整形接受函数的返回值
+	
+	while(1)
+	{ g=0;//将g初始化
+	
+		
+	if(v!=4)
+	  {system("cls");//清屏，进入游戏
+	
+	print();}//打印迷宫
+	else
+	 { system("cls");
+		 print1();
+	}//清屏，进入游戏
+		find(v);//找到玩家
+		printf("%d %d\n",x,y);
+		char moves=_getch();
+        
+               
+	switch(moves)
+		{
+	    case 'w':
+			{g=up(v);
+			printf("w");
+			break;}
+		case 'a':
+			{g=left(v);break;}
+		case 's':
+			{g=dowm(v);break;}
+		case 'd':
+			{g=turn(v);break;}
+		case '0':
+			{  
+				level=2;
+			return 0;}
+		case 'q'://输入q的时候，既打印答案迷宫
+			{
+				n=0;//初始化n为0
+				while(1)
+				{
+					if(n!=0)
+				break;
+					else 
+					anser(x,y);
+				}
+	      for(int i=0;i<count;i++)
+		  {
+	      for(int k=0;k<count;k++)
+		  {
+		  if(map1[i][k]==5)//将遍历的不是迷宫出路的所以点变为路，可视化
+			  map1[i][k]=1;
+		  }
+		  
+		  }
+				
+		  print2();//打印答案迷宫
+				
+	       Sleep(3000);//将打印的答案迷宫显示3秒
+	      for(int i=0;i<count;i++)
+		  {
+	      for(int k=0;k<count;k++)
+		  {
+		  if(map1[i][k]==5||map1[i][k]==6)//将显示的答案迷宫还原为随机迷宫
+			  map1[i][k]=1;
+		  }
+		  
+		  }
+	          
+
+			
+			
+			break;}
+	    }
+	   if(g==1&&cur_time - begin_time < game_time*1000)//走到终点跳出循环
+	   {
+	   break;
+	  
+	   }
+	 else if(cur_time - begin_time > game_time*1000)
+		{								//时间已到，游戏结束
+			system("cls");
+			printf("=============\n");
+			printf("游 戏 失 败！\n");
+			printf("=============\n");
+			printf("即将后重新开始本关卡……");
+			Sleep(2000);
+			return 1;
+		}
+
+
+		
+	}
+	
+	
+	system("cls");//跳出循环后执行的操作
+	printf("恭喜你，闯关成功\n");
+	printf("按任意键继续游戏\n");
+	_getch();
+	system("cls");
+	 
+  return 0;
+
+}
+
+int dowm(int a)//向下移动
+{
+	if(a==4)
+		{
+	if(x!=count-1)
+	{if(map1[x+1][y]==1)
+	{map1[x+1][y]=3;
+     map1[x][y]=1;}
+else if(map1[x+1][y]==4)
+   {
+	
+	return 1;
+   }
+}
+	return 0;
+	}
+	else
+	{
+	if(x!=Hight-1)
+	{if(map[level][x+1][y]==1)
+	{map[level][x+1][y]=3;
+     map[level][x][y]=1;}
+else if(map[level][x+1][y]==4)
+   {
+	
+	return 1;
+   }
+}
+	return 0;
+	}
+	}
+
+int up(int a)//向上移动
+{
+	if(a==4)
+		{if(x!=0)
+	{if(map1[x-1][y]==1)
+	{map1[x-1][y]=3;
+     map1[x][y]=1;}
+else if(map1[x-1][y]==4)
+   {
+
+	return 1;
+   }
+}
+	return 0;
+	}
+
+
+	else
+	{if(x!=0)
+	{if(map[level][x-1][y]==1)
+	{map[level][x-1][y]=3;
+     map[level][x][y]=1;}
+else if(map[level][x-1][y]==4)
+   {
+
+	return 1;
+   }
+}
+	return 0;
+	}
+}
+
+int left(int a)//向左移动
+{
+	if(a==4)
+		{
+	if(y!=0)
+	if(map1[x][y-1]==1)
+	{map1[x][y-1]=3;
+     map1[x][y]=1;}
+else if(map1[x][y-1]==4)
+   {
+	
+	return 1;
+   }
+
+	return 0;
+	}
+	else
+	{
+	if(y!=0)
+	if(map[level][x][y-1]==1)
+	{map[level][x][y-1]=3;
+     map[level][x][y]=1;}
+else if(map[level][x][y-1]==4)
+   {
+	
+	return 1;
+   }
+
+	return 0;
+	}
+}
+
+int turn(int a)//向右移动
+{
+	if(a==4)
+		{
+	if(y!=count-1)
+	{if(map1[x][y+1]==1)
+	{map1[x][y+1]=3;
+     map1[x][y]=1;}
+else if(map1[x][y+1]==4)
+   {
+	
+	return 1;
+   }
+}
+	return 0;
+	}
+	else
+	{
+	if(y!=Hight-1)
+	{if(map[level][x][y+1]==1)
+	{map[level][x][y+1]=3;
+     map[level][x][y]=1;}
+else if(map[level][x][y+1]==4)
+   {
+	
+	return 1;
+   }
+}
+	return 0;
+	}
+}
+
+void Initialize(int num)//构造随机迷宫
+{   
+	
+	int i,j;
+	if(num%2==0)//将迷宫先构造成网格状
+		count++;
+	for(i=0;i<count;i++)
+	{
+	    for(j=0;j<count;j++)
+		{
+		map1[i][j]=0;
+		}
+	}
+
+	for(i=0;i<M;i++)
+	{
+	  for(j=0;j<M;j++)
+	  {
+	    if(i>count||j>count)
+			map1[i][j]=-1;
+
+		else if(i!=0&&i!=count-1&&j!=0&&j!=count-1)
+		{
+			if(i%2==0||j%2==0)
+              map1[i][j]=0;
+			else   
+			map1[i][j]=1;
+		}
+
+		
+	  }
+	
+	}
+
+	Creat_01(1,1);//将上面的路径打通，最终生成随机迷宫（默认起点为坐标（1，1））
+	map1[1][1]=3;
+	change();
+	 system("cls");
+	
+	printf("\n");
+	printf("\n");
+	printf("\n");
+	printf("\n");
+	printf("\n");
+	printf("\n");
+	printf("                                                           ************************************************************************************\n");
+	printf("                                                           **********************************正在生成随机关卡**********************************\n");
+	printf("                                                           ************************************************************************************\n");
+	Sleep(1700);
+	begin_time=clock();//获取系统时间
+	print1();
+
+}
+
+int IsHaveNeighbox(int X_index,int Y_index)//判断构造随机迷宫的时候是否有路可走
+{ 
+	int flag=0;
+	if(X_index>=3&&map1[X_index-2][Y_index]==1||X_index<=count-3&&map1[X_index+2][Y_index]==1||Y_index<count-3&&map1[X_index][Y_index+2]==1||Y_index>3&&map1[X_index][Y_index-2]==1)
+		return 1;//
+	return 0;}
+
+int IsHaveNeighbox1(int X_index,int Y_index)//判断答案迷宫是否有路可走
+{
+	int flag=0;//初始化flag
+	if(n!=1)
+	{if(X_index>=1&&map1[X_index-1][Y_index]==1||X_index<=count-1&&map1[X_index+1][Y_index]==1||Y_index<count-1&&map1[X_index][Y_index+1]==1||Y_index>1&&map1[X_index][Y_index-1]==1)
+		return 1;
+	else
+		return 0;
+	}
+	else
+		return 0;
+}
+	
+void Creat_01(int X_index, int Y_index)//将迷宫打通最终生成随机迷宫
+{
+	int rand_position, x, y, flag = 0;
+	x = X_index;
+	y = Y_index;
+	//如果四个方向都没有了，返回上一步，否则，继续
+	while (1)
+	{
+		flag = 0;
+		flag = IsHaveNeighbox(X_index, Y_index);//判断四周是否可以打通，可以返回1，不可返回0
+		if (flag == 0)
+		{
+			return;//没有可打通的路，则返回上一个点
+		}
+		else
+		{
+			map1[X_index][Y_index] = 5;//将不是出口的点改为路标记上
+			x = X_index;
+			y = Y_index;
+			while (1)
+			{
+				rand_position = rand() % 4;//生成随机值，来生成随机的迷宫
+				if (rand_position == 0 && X_index >= 3 && map1[X_index - 2][Y_index] == 1)//上
+				{
+					X_index = X_index - 2;
+				}
+				else if (rand_position == 1 && X_index < count - 3 && map1[X_index + 2][Y_index] == 1)//下
+				{
+					X_index = X_index + 2;
+				}
+				else if (rand_position == 2 && Y_index >= 3 && map1[X_index][Y_index - 2] == 1)//左
+				{
+					Y_index -= 2;
+				}
+				else if (rand_position == 3 && Y_index < count - 3 && map1[X_index][Y_index + 2] == 1)//右
+				{
+					Y_index += 2;
+				}
+				map1[(x + X_index) / 2][(y + Y_index) / 2] = 5;//将中间的墙打通标记上路
+				map1[X_index][Y_index] = 4;//将新的点标记上出口
+				Creat_01(X_index, Y_index);//利用递归找下一个点
+				break;
+			}
+		}
+	}
+}
+
+void change()//将生成的随机路径可视化
+{   int p=0;
+	int f=0;
+	int n=0;
+	int t=0;
+	int v=0;
+	
+
+	for(int i=0;i<count;i++)//计算出所以可能的出口数量
+  {
+	  for(int j=0;j<count;j++)
+	  {
+	  if( map1[i][j]==4)
+	  {
+		 
+		 f++;
+	  }
+	  
+	  }
+    }
+	
+	printf("需要生成出口的数量：\n");
+	scanf_s("%d",&t);
+	
+
+	while(1)//判断输入的需要生成的出口数量是否合法
+	{
+	if(t>f)
+{ 
+
+ printf("出口太多，无法生成\n");
+ printf("****************************\n");
+ printf("*****************************\n");
+ printf("请重新输入需要生成的出口数量\n");
+ scanf_s("%d",&t);
+ getchar();
+ system("cls");
+}
+	
+	else if(t==0)
+	{
+
+ printf("无法生成出口数量为0的迷宫\n");
+ printf("****************************\n");
+ printf("*****************************\n");
+ printf("请重新输入需要生成的出口数量\n");
+ scanf_s("%d",&t);
+ getchar();
+ system("cls");
+	
+	}
+
+	
+
+	else
+	{
+
+	break;
+	}
+	}
+	
+for(int i=0;i<count;i++)
+  {
+	  for(int j=0;j<count;j++)
+	  {
+	  if(map1[i][j]==1)
+		  map1[i][j]=0;
+	  }
+  }
+
+for(int i=0;i<count;i++)
+  {
+	  for(int j=0;j<count;j++)
+	  {
+	  if(map1[i][j]==5)
+		  map1[i][j]=1;
+	  }
+  }
+
+
+for(int i=0;i<count;i++)//生成输入的随机出口数量
+  {
+	  for(int j=0;j<count;j++)
+	  {
+	  if( map1[i][j]==4)
+	  {
+		 
+		  int r=rand() % 2;
+	   
+		    if(r==0)
+	   {
+		   v++; 
+	   }
+		   if(r==1&&p<f-t||v>t)
+	   {
+	   map1[i][j]=1;
+	   p++;
+	    
+	   }
+		   
+	 
+	   
+	  
+	  }
+	  
+	  }
+    }
+  }
+   
+ void anser(int X_index, int Y_index)//构造答案迷宫
+{
+	
+	
+	int rand_position, x, y,flag = 0;//定义需要用到的变量
+	
+	x = X_index;//将原来的点赋值给x，y
+	y = Y_index;
+	//如果四个方向都没有了，返回上一步，否则，继续
+	while (1)
+	{
+		
+		flag = 0;//每一次循环初始化flag
+		flag = IsHaveNeighbox1(X_index, Y_index);//判断是否有路可走，没有路返回0，有路则返回1
+		find1();//找到玩家所在的坐标a,b，并将玩家所在的地方变为可视化的字符
+		if (flag == 0)//没有路的时候
+		{
+		
+			if(map1[x+1][y]==4||map1[x-1][y]==4||map1[x][y+1]==4||map1[x][y-1]==4)//判断下一个点是否为终点，如果是的话就另n=1，
+				n=1;
+			
+			
+			if(n==1&&map1[x][y]!=3)//n==1的时候，既找到终点，递归返回到玩家所在的位置，将除了玩家的路线设置为可视化的答案路线
+				map1[X_index][Y_index]=6;
+			
+			return;//没有路的时候返回上一个点
+		}
+		else//有路的时候
+		{
+			map1[X_index][Y_index] = 5;
+			x = X_index;
+			y = Y_index;
+			while (1)
+			{
+				rand_position = rand() % 4;//生成随机值
+				if (rand_position == 0 && X_index >= 1&& map1[X_index - 1][Y_index] == 1)//想要往上
+				{
+					X_index = X_index - 1;
+				}
+				else if (rand_position == 1 && X_index < count - 1 && map1[X_index + 1][Y_index] == 1)//想要往下
+				{
+					X_index = X_index + 1;
+				}
+				else if (rand_position == 2 && Y_index >= 1 && map1[X_index][Y_index - 1] == 1)//想要往左
+				{
+					Y_index -= 1;
+				}
+				else if (rand_position == 3 && Y_index < count - 1 && map1[X_index][Y_index + 1] == 1)//想要往右
+				{
+					Y_index += 1;
+				}
+				
+				map1[x][y] = 5;//将找过的路设置为5
+				map1[X_index][Y_index] = 5;
+				
+				anser(X_index, Y_index);//递归找下一个点，一直到无路可走，则返回，跳出循环//进入上一个循环
+				break;
+				
+		       
+			}
+		}
+	}
+	 
+
+	}
+	
+
+int main()
+{   
+	int flase=0;
+	
+	//srand((unsigned)time(NULL));//生成随机种子
+	
+	system("mode con cols=220 lines=100");
+	system("color 0A");//将窗口上色
+   
+	
+  while(1)
+  { 
+	 int v=menu();
+    flase=move(v);
+	system("cls");
+	
+	if(v==5)//选择第5种模式的时候
+	{
+	while(1)//关卡循环
+	{
+		system("cls");
+	
+   if(flase==1)//闯关失败的时候，重新开始关卡
+	{   printf("\n");
+	printf("\n");
+	printf("\n");
+	printf("\n");
+	printf("\n");
+	printf("\n");
+	printf("                                                           ************************************************************************************\n");
+	printf("                                                           ***************************************第%d关****************************************\n",level+1);
+	printf("                                                           ************************************************************************************\n");
+	Sleep(1700);
+	begin_time = clock(); //获取当前时间 
+	flase=move(v);}
+
+   else if(flase==0&&level<H-1)
+		{
+level++;
+	printf("\n");
+	printf("\n");
+	printf("\n");
+	printf("\n");
+	printf("\n");
+	printf("\n");
+	printf("                                                           ************************************************************************************\n");
+	printf("                                                           ***************************************第%d关****************************************\n",level+1);
+	printf("                                                           ************************************************************************************\n");
+	Sleep(1700);
+	begin_time = clock(); //获取当前时间 
+	flase=move(v);
+	}
+	else
+		{
+			break;
+	}
+	}
+	}
+  }
+return 0;
+}
+
